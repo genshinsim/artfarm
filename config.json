@@ -1,0 +1,15 @@
+{
+    "main_stat": {
+        "flower": "hp",
+        "feather": "atk",
+        "sand": "atk%",
+        "goblet": "pyro%",
+        "circlet": "cr"
+    },
+    "desired_subs": {
+        "cr": 0.24,
+        "cd": 0.3
+    },
+    "iterations": 100000,
+    "workers": 24
+}

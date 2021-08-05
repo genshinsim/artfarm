@@ -188,7 +188,7 @@ type Artifact struct {
 	Ok   bool
 }
 
-const maxTries = 100000000 //100mil
+const maxTries = 1000000000 //1 bil
 
 //FarmArtifact return number of tries it tooks to reach the desired subs
 //main is the desired main stat; if main == EndStatType then there's no requirement

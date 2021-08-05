@@ -1,28 +1,111 @@
 package main
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math"
 	"math/rand"
+	"os"
+	"runtime"
 	"time"
 
 	"github.com/genshinsim/artfarm/internal/lib"
 )
 
-func main() {
-	var main [5]lib.StatType
-	main[lib.Feather] = lib.ATK
-	main[lib.Flower] = lib.HP
-	main[lib.Sand] = lib.ATKP
-	main[lib.Goblet] = lib.PyroP
-	main[lib.Circlet] = lib.CR
-	var desired [lib.EndStatType]float64
-	desired[lib.CR] = 0.2
+type config struct {
+	Main       map[string]string  `json:"main_stat"`
+	Subs       map[string]float64 `json:"desired_subs"`
+	Iterations int                `json:"iterations"`
+	Workers    int                `json:"workers"`
+}
 
-	defer elapsed("artifact farm sim")()
-	min, max, mean, sd := sim(10000000, 24, main, desired)
+func main() {
+
+	err := run()
+
+	if err != nil {
+		fmt.Printf("error encountered: %v\n", err)
+	}
+
+	fmt.Print("Press 'Enter' to continue...")
+	bufio.NewReader(os.Stdin).ReadBytes('\n')
+
+}
+
+func run() error {
+	var source []byte
+	var err error
+	var opt config
+	source, err = ioutil.ReadFile("./config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = json.Unmarshal(source, &opt)
+	if err != nil {
+		return err
+	}
+
+	var main [5]lib.StatType
+	var desired [lib.EndStatType]float64
+
+	//parse config
+	for k, v := range opt.Main {
+		// log.Printf("adding main stat %v: %v\n", k, v)
+		i := lib.StrToSlotType(k)
+		if i == -1 {
+			return fmt.Errorf("unrecognized artifact slot: %v", k)
+		}
+		s := lib.StrToStatType(v)
+		if s == -1 {
+			return fmt.Errorf("unrecognized main stat for %v: %v", k, v)
+		}
+		main[i] = s
+	}
+
+	for k, v := range opt.Subs {
+		// log.Printf("adding desired stat %v: %v\n", k, v)
+		s := lib.StrToStatType(k)
+		if s == -1 {
+			return fmt.Errorf("unrecognized sub stat : %v", k)
+		}
+		if v < 0 {
+			return fmt.Errorf("sub stat %v cannot be negative : %v", k, v)
+		}
+		desired[s] = v
+	}
+
+	//sanity check
+	ok := false
+	for _, v := range desired {
+		if v > 0 {
+			ok = true
+		}
+	}
+
+	if !ok {
+		return fmt.Errorf("desired_subs cannot all be 0")
+	}
+
+	if opt.Workers == 0 {
+		opt.Workers = runtime.NumCPU()
+	}
+
+	if opt.Iterations == 0 {
+		opt.Iterations = 100000
+	}
+
+	defer elapsed(fmt.Sprintf("simulation complete; %v iterations", opt.Iterations))()
+
+	min, max, mean, sd, err := sim(opt.Iterations, opt.Workers, main, desired)
+	if err != nil {
+		return err
+	}
 	fmt.Printf("avg: %v, min: %v, max: %v, sd: %v\n", mean, min, max, sd)
+
+	return nil
 }
 
 func elapsed(what string) func() {
@@ -37,7 +120,7 @@ type result struct {
 	err   error
 }
 
-func sim(n, w int, main [lib.EndSlotType]lib.StatType, desired [lib.EndStatType]float64) (min, max int, mean, sd float64) {
+func sim(n, w int, main [lib.EndSlotType]lib.StatType, desired [lib.EndStatType]float64) (min, max int, mean, sd float64, err error) {
 	var progress, ss float64
 	var sum int
 	var data []int
@@ -68,7 +151,8 @@ func sim(n, w int, main [lib.EndSlotType]lib.StatType, desired [lib.EndStatType]
 	for count > 0 {
 		r := <-resp
 		if r.err != nil {
-			log.Panicln(r.err)
+			err = r.err
+			return
 		}
 
 		data = append(data, r.count)

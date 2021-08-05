@@ -105,48 +105,65 @@ const (
 	EndSlotType
 )
 
+var SlotTypeString = [...]string{
+	"flower",
+	"feather",
+	"sand",
+	"goblet",
+	"circlet",
+}
+
+func StrToSlotType(s string) SlotType {
+	for i, v := range SlotTypeString {
+		if v == s {
+			return SlotType(i)
+		}
+	}
+	return -1
+}
+
 var MainStatVal = [][]float64{
 	//flower
 	{
-		0, //def%
-		0, //def
+		0,    //def%
+		0,    //def
 		4780, //hp
-		0, //hp%
-		0, //atk
-		0, //atk%
-		0, //er
-		0, //em
-		0, //cr
-		0, //cd
-		0, //heal
-		0, //pyro
-		0, //hydro
-		0, //cryo
-		0, //electro
-		0, //anemo
-		0, //geo
-		0, //phys
+		0,    //hp%
+		0,    //atk
+		0,    //atk%
+		0,    //er
+		0,    //em
+		0,    //cr
+		0,    //cd
+		0,    //heal
+		0,    //pyro
+		0,    //hydro
+		0,    //cryo
+		0,    //electro
+		0,    //anemo
+		0,    //geo
+		0,    //phys
 	},
 	//feather,
 	{
-		0, //def%
-		0, //def
-		0, //hp
-		0, //hp%
+		0,   //def%
+		0,   //def
+		0,   //hp
+		0,   //hp%
 		311, //atk
-		0, //atk%
-		0, //er
-		0, //em
-		0, //cr
-		0, //cd
-		0, //heal
-		0, //pyro
-		0, //hydro
-		0, //cryo
-		0, //electro
-		0, //anemo
-		0, //geo
-		0, //phys
+		0,   //atk%
+		0,   //er
+		0,   //em
+		0,   //cr
+		0,   //cd
+		0,   //heal
+		0,   //pyro
+		0,   //hydro
+		0,   //cryo
+		0,   //electro
+		0,   //anemo
+		0,   //geo
+		0,   //phys
 	},
 	//sand
 	{
@@ -156,7 +173,7 @@ var MainStatVal = [][]float64{
 		.466, //hp%
 		0,    //atk
 		.466, //atk%
-		.518,  //er
+		.518, //er
 		187,  //em
 		0,    //cr
 		0,    //cd
@@ -172,16 +189,16 @@ var MainStatVal = [][]float64{
 	//goblet
 	{
 		.583, //def%
-		0,   //def
-		0,   //hp
+		0,    //def
+		0,    //hp
 		.466, //hp%
-		0,   //atk
+		0,    //atk
 		.466, //atk%
-		0,   //er
-		187, //em
-		0,   //cr
-		0,   //cd
-		0,   //heal
+		0,    //er
+		187,  //em
+		0,    //cr
+		0,    //cd
+		0,    //heal
 		.466, //pyro
 		.466, //hydro
 		.466, //cryo
@@ -200,9 +217,9 @@ var MainStatVal = [][]float64{
 		.466, //atk%
 		0,    //er
 		187,  //em
-		.311,  //cr
-		.622,  //cd
-		.359,  //heal
+		.311, //cr
+		.622, //cd
+		.359, //heal
 		0,    //pyro
 		0,    //hydro
 		0,    //cryo
