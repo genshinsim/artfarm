@@ -262,11 +262,11 @@ func update(bag []Artifact, a Artifact, main [EndSlotType]StatType, desired [End
 		if x.Ok {
 			for i, v := range x.Subs {
 				if desired[i] > 0 {
-					if desired[i] < v {
-						total += 1
-					} else {
-						total += v / desired[i]
+					prog := v / desired[i]
+					if prog > 1 {
+						prog = 1
 					}
+					total += prog
 				}
 			}
 		}
@@ -275,11 +275,11 @@ func update(bag []Artifact, a Artifact, main [EndSlotType]StatType, desired [End
 		if !replaced && x.Slot == a.Slot {
 			for i, v := range a.Subs {
 				if desired[i] > 0 {
-					if desired[i] < v {
-						next += 1
-					} else {
-						next += v / desired[i]
+					prog := v / desired[i]
+					if prog > 1 {
+						prog = 1
 					}
+					next += prog
 				}
 			}
 		} else {

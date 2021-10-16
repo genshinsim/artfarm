@@ -8,7 +8,8 @@
     },
     "desired_subs": {
         "cr": 0.24,
-        "cd": 0.3
+        "cd": 0.3,
+        "em": 10
     },
     "iterations": 100000,
     "workers": 24
